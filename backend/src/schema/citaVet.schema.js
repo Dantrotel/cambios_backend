@@ -82,6 +82,17 @@ const citaVeterinariaBodySchema = Joi.object({
       "any.required": "El correo es obligatorio",
       "string.email": "El correo debe tener un formato válido",
     }),
+  
+  state: Joi.string()
+    .valid("Cita por confirmar", "Cita confirmada", 
+            "Cita cancelada por el cliente", "Cita cancelada por el veterinario")
+    .default("Cita por confirmar")
+    .required()
+    .messages({
+      "string.empty": "El estado no puede estar vacío",
+      "any.required": "El estado es obligatorio",
+      "any.only": "El estado debe ser 'Cita por confirmar', 'Cita confirmada' o 'Cita rechazada'",
+    }),
 });
 
 export default citaVeterinariaBodySchema;

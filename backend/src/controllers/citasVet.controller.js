@@ -49,7 +49,12 @@ export async function createCitaVeterinario(req, res) {
       return respondError(req, res, 400, errorMessage);
     }
 
-    const { mascota, fecha, hora, motivo, email } = value;
+    const { mascota, fecha, hora, motivo, email, state } = value;
+
+    // Verificar que el estado sea "Cita por confirmar"
+    if (state !== "Cita por confirmar") {
+      return respondError(req, res, 400, "El estado de la cita debe ser 'Cita por confirmar' al crear la cita.");
+    }
 
     // Verificar si ya existe una cita para la misma mascota en la misma fecha y hora
     const existingCita = await citaVetModel.findOne({ mascota, fecha, hora });
@@ -66,7 +71,7 @@ export async function createCitaVeterinario(req, res) {
     }
 
     // Crear la cita veterinaria
-    const nuevaCita = await CitaVeterinarioService.createCitaVeterinario(req.body);
+    const nuevaCita = await CitaVeterinarioService.createCitaVeterinario(value);
 
     // Obtener el nombre de la mascota
     const mascotaDetalle = await Mascota.findById(mascota);
@@ -75,11 +80,12 @@ export async function createCitaVeterinario(req, res) {
     const razaMascota = mascotaDetalle.raza;
     const identificacionMascota = mascotaDetalle.identificacion;
     const estadoSaludMascota = mascotaDetalle.estadoSalud;
-    
+
     // Construir el contenido del correo electrónico
     const htmlContent = `
       <strong>Su solicitud para la cita veterinaria.</strong><br>
-      La cita se agendó para el <strong>${fecha}</strong>.
+      se solicita una cita para el <strong>${fecha}</strong>.
+      <br>a continuación se detallan los datos de la mascota y el motivo de la cita:<br>
       <br>Rut: ${identificacionMascota}<br>
       Nombre de la mascota: ${nombreMascota}<br>
       Edad: ${edadMascota}<br>
@@ -95,11 +101,11 @@ export async function createCitaVeterinario(req, res) {
       subject: "Solicitud de cita veterinaria",
       html: htmlContent,
     });
-  
+
     if (emailError) {
       throw new Error(`Error al enviar el correo de confirmación: ${emailError.message}`);
     }
-  
+
     respondSuccess(req, res, 200, { data: nuevaCita });
   } catch (error) {
     handleError(error, "citaVeterinario.controller -> createCitaVeterinario");

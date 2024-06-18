@@ -40,7 +40,7 @@ async function createCitaVeterinario(citaVeterinario) {
       // Si hay errores de validación, lanzar una excepción con un mensaje de error específico
       throw new Error(`Error de validación: ${error.message}`);
     }
-
+    
     // Crear una nueva instancia de CitaVeterinario con los datos proporcionados
     const nuevaCitaVeterinario = new CitaVeterinario(citaVeterinario);
     

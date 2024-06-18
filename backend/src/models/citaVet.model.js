@@ -19,6 +19,13 @@ const citaVeterinarioSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    state: {
+        type: String,
+        enum: ["Cita por confirmar", "Cita confirmada", 
+            "Cita cancelada por el cliente", "Cita cancelada por el veterinario"],
+        default: "Cita por confirmar",
+        required: true,
+    },
 });
 
 
